@@ -30,8 +30,8 @@ export const transactionAPI = createApi({
             })
         }),
         updateTransaction: builder.mutation({
-            query: (id, requestBody) => ({
-                url: `transactions/${id}`,
+            query: (requestBody) => ({
+                url: `transactions/${requestBody.id}`,
                 method: 'PUT',
                 body: requestBody
             })

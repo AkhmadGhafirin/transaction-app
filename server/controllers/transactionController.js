@@ -108,9 +108,9 @@ class TransactionController {
 
     static async create(req, res, next) {
         try {
-            const { productID, productName, amount, customerName, createBy } = req.body
+            const { productID, productName, amount, customerName, createBy, status } = req.body
             await Transaction.create({
-                productID, productName, amount, customerName, createBy, status: 0, transactionDate: new Date(), createOn: new Date()
+                productID, productName, amount, customerName, createBy, status, transactionDate: new Date(), createOn: new Date()
             })
 
             res.status(201).json({
@@ -128,7 +128,7 @@ class TransactionController {
         try {
             const { id } = req.params
             const { productID, productName, amount, customerName, status } = req.body
-
+            console.log(productID, productName, amount, customerName, status, '<<<<<<< formupdate');
             const findTransaction = await Transaction.findOne({ where: { id } })
 
             if (!findTransaction) throw { name: 'NotFound' }

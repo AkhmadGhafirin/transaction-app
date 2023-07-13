@@ -95,14 +95,22 @@ const TransactionForm = () => {
     e.preventDefault();
     setValidated(true);
     // if (checkValidate()) {
-    if (id) {
-      await dispatcherUpdate(form);
-      toast.success("Successfully update transaction");
-    } else {
-      await dispatcherCreate(form);
-      toast.success("Successfully create new transaction");
+    try {
+      if (id) {
+        const payload = {
+          ...form,
+          id: id
+        }
+        await dispatcherUpdate(payload);
+        toast.success("Successfully update transaction");
+      } else {
+        await dispatcherCreate(form);
+        toast.success("Successfully create new transaction");
+      }
+      navigate("/transactions");
+    } catch (err) {
+      toast.error(err);
     }
-    navigate("/transactions");
     // }
   };
 
