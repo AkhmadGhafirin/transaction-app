@@ -6,7 +6,7 @@ Build Using node js, express js, sequelize, postgreSQL, RTK, React js
 
 
 
-## Installation
+## Setup
 
 ```bash
 cd server
