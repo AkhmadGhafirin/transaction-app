@@ -12,6 +12,7 @@ npm i
 npm i -g nodemon sequelize-cli
 sequelize db:migrate
 sequelize db:seed:all
+nodemon app.js
 ```
 ```bash
 cd client
