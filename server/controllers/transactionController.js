@@ -17,6 +17,7 @@ class TransactionController {
                 ],
                 raw: true
             })
+            console.log(transactions);
             res.status(200).json({
                 statusCode: 200,
                 data: transactions

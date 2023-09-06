@@ -6,53 +6,69 @@ import {
   useCreateTransactionMutation,
   useUpdateTransactionMutation,
   useGetTransactionByIdQuery,
+  useLazyGetTransactionByIdQuery
 } from "../services/transaction";
 import { toast } from "react-toastify";
 
 const TransactionForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  console.log(id, "transsmkam");
   const [validated, setValidated] = useState(false);
+
   const [
-    dispatcherCreate,
-    { isLoading: isLoadingCreate, isFetching: isFetchingCreate },
+    createTransaction, { isSuccess: isSuccessCreate, isError: isErrorCreate, error: errorCreate, isLoading: isLoadingCreate },
   ] = useCreateTransactionMutation();
+
   const [
-    dispatcherUpdate,
-    { isLoading: isLoadingUpdate, isFetching: isFetchingUpdate },
+    updateTransaction, { isSuccess: isSuccessUpdate, isError: isErrorUpdate, error: errorUpdate, isLoading: isLoadingUpdate },
   ] = useUpdateTransactionMutation();
+
   const [form, setForm] = useState({
     productID: "",
     productName: "",
     amount: "",
     customerName: "",
-    status: "",
+    status: "0",
     transactionDate: "",
     createBy: "",
   });
 
-  const {
-    data: transaction,
-    isLoading,
-    isFetching,
-  } = useGetTransactionByIdQuery(id);
+  const [getTransaction, { data: transaction, isLoading, isError, error }] = useLazyGetTransactionByIdQuery(id);
 
   useEffect(() => {
+    if (id) {
+      getTransaction(id)
+    }
     if (transaction) {
-      console.log(transaction, "transaction effect");
       const date = new Date(transaction?.data?.transactionDate);
       const month =
         date.getMonth() < 10 ? `0${date.getMonth()}` : date.getMonth();
       const day = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate();
       const formatTransactionDate = `${date.getFullYear()}-${month}-${day}`;
-      console.log(formatTransactionDate, "<<<format");
       setForm({
         ...transaction?.data,
         transactionDate: formatTransactionDate,
       });
     }
-  }, [transaction]);
+    if (isError) {
+      toast.error(error?.data?.error?.message)
+    }
+    if (isErrorCreate) {
+      toast.error(errorCreate?.data?.error?.message)
+    }
+    if (isErrorUpdate) {
+      toast.error(errorUpdate?.data?.error?.message)
+    }
+
+    if (isSuccessCreate) {
+      toast.success("Successfully create new transaction");
+      navigate("/transactions");
+    }
+    if (isSuccessUpdate) {
+      toast.success("Successfully update transaction");
+      navigate("/transactions");
+    }
+  }, [id, transaction, isSuccessCreate, isSuccessUpdate, isErrorCreate, isErrorUpdate, isError, error, errorCreate, errorUpdate]);
 
   const handleOnChange = (e) => {
     const { value, name } = e.target;
@@ -72,6 +88,8 @@ const TransactionForm = () => {
       transactionDate,
       createBy,
     } = form;
+
+    console.log(form, 'iniFormCuy');
 
     return (
       productID !== undefined &&
@@ -94,35 +112,20 @@ const TransactionForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setValidated(true);
-    // if (checkValidate()) {
-    try {
+    if (checkValidate()) {
       if (id) {
         const payload = {
           ...form,
           id: id
         }
-        await dispatcherUpdate(payload);
-        toast.success("Successfully update transaction");
+        await updateTransaction(payload);
       } else {
-        await dispatcherCreate(form);
-        toast.success("Successfully create new transaction");
+        await createTransaction(form);
       }
-      navigate("/transactions");
-    } catch (err) {
-      toast.error(err);
     }
-    // }
   };
 
-  if (
-    isLoading ||
-    isFetching ||
-    isLoadingCreate ||
-    isFetchingCreate ||
-    isLoadingUpdate ||
-    isFetchingUpdate
-  )
-    return <Loading />;
+  if (isLoading || isLoadingCreate || isLoadingUpdate) return <Loading />;
 
   return (
     <>

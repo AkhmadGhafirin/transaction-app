@@ -8,46 +8,58 @@ export const transactionAPI = createApi({
     }),
     endpoints: (builder) => ({
         getTransactions: builder.query({
-            query: (filter) => ({
-                url: `transactions${filter ? filter : ''}`
-            })
+            query: ({ year, month }) => ({
+                url: 'transactions',
+                params: {
+                    year: year,
+                    month: month
+                }
+            }),
+            providesTags: () => [{ type: 'transactionList' }]
         }),
         getTransactionById: builder.query({
             query: (id) => ({
                 url: `transactions/${id}`
-            })
+            }),
+            providesTags: () => [{ type: 'transactionList' }]
         }),
         getTransactionsSummaries: builder.query({
             query: () => ({
                 url: 'transactions/summaries'
-            })
+            }),
+            providesTags: ['transactionList']
         }),
         createTransaction: builder.mutation({
             query: (requestBody) => ({
                 url: 'transactions',
                 method: 'POST',
                 body: requestBody
-            })
+            }),
+            invalidatesTags: ['transactionList']
         }),
         updateTransaction: builder.mutation({
             query: (requestBody) => ({
                 url: `transactions/${requestBody.id}`,
                 method: 'PUT',
                 body: requestBody
-            })
+            }),
+            invalidatesTags: ['transactionList']
         }),
         deleteTransaction: builder.mutation({
             query: (id) => ({
                 url: `transactions/${id}`,
                 method: 'DELETE',
-            })
+            }),
+            invalidatesTags: ['transactionList']
         })
     })
 })
 
 export const {
     useGetTransactionsQuery,
+    useLazyGetTransactionsQuery,
     useGetTransactionByIdQuery,
+    useLazyGetTransactionByIdQuery,
     useGetTransactionsSummariesQuery,
     useCreateTransactionMutation,
     useUpdateTransactionMutation,
