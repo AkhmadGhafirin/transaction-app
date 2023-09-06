@@ -1,6 +1,4 @@
 
-# Setup
-
 Build Using node js, express js, sequelize, postgreSQL, RTK, React js
 
 
